@@ -3,6 +3,7 @@
 //
 // TODO: remove the next line once every function below is used.
 #![allow(dead_code)]
+use crate::read_int;
 
 // TODO: add the imports you need (the pattern and generation prompts use
 // crate::input::read_int; waiting for Enter uses std::io).
@@ -135,17 +136,68 @@ pub fn population(grid: &Grid) -> usize {
 // 2 block, 3 glider), ask how many generations, then print each generation with its
 // number and population, waiting for Enter between steps.
 pub fn play() {
+    
+    println!("1) Blinker");
+    println!("2) Block");
+    println!("3) Glider");
+
+    let pattern_choice = read_int("Which pattern? ", 1, 3);
+   
+    let total_generations = read_int("How many generations to run? ", 0, 1000);
+
     let mut grid = new_grid();
-    grid[4][10] = true;
-    grid[5][10] = true;
-    grid[6][10] = true;
+    match pattern_choice {
+        1 => {
+
+            grid[4][10] = true;
+            grid[5][10] = true;
+            grid[6][10] = true;
+        }
+        2 => {     
+          
+            grid[4][10] = true;
+            grid[4][11] = true;
+            grid[5][10] = true;
+            grid[5][11] = true;
+        }
+        3 => {
+             
+            grid[4][11] = true;
+            grid[5][12] = true;
+            grid[6][10] = true;
+            grid[6][11] = true;
+            grid[6][12] = true;
+        }
+        _ => {
+            println!("Invalid pattern choice.");
+            return;
+        }
+    }
+
+    for current_generation in 0..=total_generations {
+     
+        let mut population = 0;
+        for row in 0..grid.len() {
+            for col in 0..grid[row].len() {
+                if grid[row][col] {
+                    population += 1;
+                }
+            }
+        }
+
+    println!("Generation {}, population {}", current_generation, population);
     print_grid(&grid);
-    println!();
-    print_neighbor_counts(&grid);
-    println!();
-    let alive = grid[5][10];
-    let neighbors = count_neighbors(&grid, 5, 10);
-    println!("Center cell next generation: {}", if next_state(alive, neighbors) { "alive" } else { "dead" });
+
+    if current_generation < total_generations {
+        println!("Press Enter for the next generation.");
+ 
+        let mut wait_buffer = String::new();
+        let _ = std::io::stdin().read_line(&mut wait_buffer);
+
+        grid = next_generation(&grid);
+       
+      }
+   }
 }
 
 #[cfg(test)]
