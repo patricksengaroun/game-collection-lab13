@@ -296,3 +296,40 @@ fn glider_moves_one_down_one_right_after_four() {
 
     assert_eq!(grid, expected_grid, "The grid state does not match the expected shifted glider grid.");
 }
+
+#[test]
+fn blinker_oscillates_from_vertical_to_horizontal_after_one() {
+    // This test catches a version of next_generation that fails to clear old dead cells or fails to handle simultaneous birth and death rules properly.
+    
+    let mut grid = new_grid();
+    grid[4][10] = true;
+    grid[5][10] = true;
+    grid[6][10] = true;
+
+    let mut next_grid = new_grid();
+    for r in 0..grid.len() {
+        for c in 0..grid[r].len() {
+            let alive = grid[r][c];
+            let neighbors = count_neighbors(&grid, r, c);
+            next_grid[r][c] = next_state(alive, neighbors);
+        }
+    }
+    grid = next_grid;
+
+    let mut population = 0;
+    for row in 0..grid.len() {
+        for col in 0..grid[row].len() {
+            if grid[row][col] {
+                population += 1;
+            }
+        }
+    }
+    assert_eq!(population, 3, "Blinker population must remain exactly 3 cells");
+
+    let mut expected_grid = new_grid();
+    expected_grid[5][9]  = true; 
+    expected_grid[5][10] = true; 
+    expected_grid[5][11] = true; 
+
+    assert_eq!(grid, expected_grid, "The grid state does not match a horizontal blinker arrangement.");
+}
