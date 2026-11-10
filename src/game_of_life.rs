@@ -255,3 +255,44 @@ mod tests {
     // population is 5 and the shape has moved one row and one column along its
     // direction of travel), and one more test of your own choosing.
 }
+
+#[test]
+fn glider_moves_one_down_one_right_after_four() {
+    let mut grid = new_grid();
+    grid[4][11] = true;
+    grid[5][12] = true;
+    grid[6][10] = true;
+    grid[6][11] = true;
+    grid[6][12] = true;
+
+    for _ in 0..4 {
+        let mut next_grid = new_grid();
+        for r in 0..grid.len() {
+            for c in 0..grid[r].len() {
+                let alive = grid[r][c];
+                let neighbors = count_neighbors(&grid, r, c);
+                next_grid[r][c] = next_state(alive, neighbors);
+            }
+        }
+        grid = next_grid;
+    }
+
+    let mut population = 0;
+    for row in 0..grid.len() {
+        for col in 0..grid[row].len() {
+            if grid[row][col] {
+                population += 1;
+            }
+        }
+    }
+    assert_eq!(population, 5, "Glider population should be exactly 5 after 4 generations");
+
+    let mut expected_grid = new_grid();
+    expected_grid[5][12] = true; 
+    expected_grid[6][13] = true; 
+    expected_grid[7][11] = true; 
+    expected_grid[7][12] = true; 
+    expected_grid[7][13] = true; 
+
+    assert_eq!(grid, expected_grid, "The grid state does not match the expected shifted glider grid.");
+}
